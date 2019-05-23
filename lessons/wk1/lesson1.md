@@ -49,3 +49,35 @@
 - #52 - Make game familiar, yet different
     - Another "Make it fun" specific rule. All successful games have a **mix of familiar elements and some fresh or unique variations.** 
 
+
+## What is a game?
+- Successful game design?
+    - successful when there is *meaningful play*
+        - The process by which a player takes action within the designed system of a game and the system responds to the action
+            - Any action produces outcome
+        - **Evaluative**: relationships between actions and outcomes in a game are both discernable (immediate perceivable) and integrated (affects the game in the later point) into the larger context of the game.
+- Formal Elements:
+    1. Players
+    2. Objectives
+    3. Procedures
+    4. Rules
+    5. Resources
+    6. Conflict
+    7. Boundaries
+    8. Outcomes
+
+- Players:
+    - Voluntary: active participants in gaming activity
+    - Player Interactions: <span style="color:yellow">TODO</span>
+        1. player vs game (single player)
+        2. player vs player (pvp)
+        3. player vs computer
+        4. MOBA
+        5. 
+
+- Procedures:
+    - Who does what? When and how?
+    - Actions and methods of play allowed by a game's rules
+        - Specific instructions
+        - dictate what is possible
+        - Resolving brings game to an end
