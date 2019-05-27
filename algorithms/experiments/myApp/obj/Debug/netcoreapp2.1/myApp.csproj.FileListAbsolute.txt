@@ -1,0 +1,11 @@
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\bin\Debug\netcoreapp2.1\myApp.deps.json
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\bin\Debug\netcoreapp2.1\myApp.runtimeconfig.json
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\bin\Debug\netcoreapp2.1\myApp.runtimeconfig.dev.json
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\bin\Debug\netcoreapp2.1\myApp.dll
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\bin\Debug\netcoreapp2.1\myApp.pdb
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\obj\Debug\netcoreapp2.1\myApp.csprojAssemblyReference.cache
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\obj\Debug\netcoreapp2.1\myApp.csproj.CoreCompileInputs.cache
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\obj\Debug\netcoreapp2.1\myApp.AssemblyInfoInputs.cache
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\obj\Debug\netcoreapp2.1\myApp.AssemblyInfo.cs
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\obj\Debug\netcoreapp2.1\myApp.dll
+D:\desktopStorage\school\SUTD_Game_Design_50.033\algorithms\experiments\myApp\obj\Debug\netcoreapp2.1\myApp.pdb
