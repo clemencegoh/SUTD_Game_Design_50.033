@@ -1,0 +1,3 @@
+[submodule "BigSlimeSmallSlime"]
+	path = BigSlimeSmallSlime
+	url = git@github.com:angelialau/BigSlimeSmallSlime.git

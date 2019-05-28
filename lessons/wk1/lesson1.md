@@ -55,6 +55,7 @@
     - successful when there is *meaningful play*
         - The process by which a player takes action within the designed system of a game and the system responds to the action
             - Any action produces outcome
+        - **Descriptive**
         - **Evaluative**: relationships between actions and outcomes in a game are both discernable (immediate perceivable) and integrated (affects the game in the later point) into the larger context of the game.
 - Formal Elements:
     1. Players
