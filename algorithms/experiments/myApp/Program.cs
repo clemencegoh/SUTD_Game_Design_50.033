@@ -16,11 +16,9 @@ namespace myApp
 
             DungeonGeneration.OverWorld overworld = new DungeonGeneration.OverWorld(s);
 
-            // overworld.first_stage.PrintStage();  // prints the stage out
+            overworld.first_stage.PrintStage();  // prints the stage out
 
             // DungeonGeneration.Room r = overworld.first_stage.first_room;
-
-
         }
     }
 }
@@ -66,20 +64,26 @@ namespace DungeonGeneration
         public Stage next;
         public Room first_room;
 
+        private int n_length;
+        private bool[,] visitedNodes;
+        private Random rand = new Random();
+
         // Default constructor, for placeholder Stage
         public Stage(){
             
             // Use Default of 4
             this.map = new Room[6, 6];
+            this.n_length = 6;
+            this.visitedNodes = new bool[6,6];
 
             GenerateStage(0);
         }
 
         public Stage(int min_nodes, int max_depth){
-            // min number of nodes before boss room
-
             // Generate 2D array placeholder
             this.map = new Room[min_nodes+2, min_nodes+2];
+            this.n_length = min_nodes + 2;
+            this.visitedNodes = new bool[min_nodes+2, min_nodes+2];
 
             GenerateStage(max_depth);
         }
@@ -94,51 +98,139 @@ namespace DungeonGeneration
             fillMainRooms(positions[0], positions[1]);
 
             // Fill side rooms
-            // fillSideRooms(positions[0], 0, max_depth);
-            
-            this.PrintStage();
+            fillSideRooms(this.map[positions[0], 0], max_depth);
         }
 
 
         // Helper function for filling out side rooms
-        private void fillSideRooms(Coords from, Coords current, int max_depth)
+        private void fillSideRooms(Room current, int depth)
         {
-            int max_len = this.map.GetLength(0) - 1;
-            if (current.x > max_len || current.y > max_len)
+            if (current == null){
+                return;
+            }
+
+            if (current is StartRoom)
+            {
+                current = current.Next;
+            }
+
+            if (current is BossRoom)
+            {
+                return;
+            }
+            
+            // set current position as already visited
+            this.visitedNodes[current.coords.x, current.coords.y] = true;
+            
+            checkRoom(current, "Up", depth);
+            checkRoom(current, "Right", depth);
+            checkRoom(current, "Down", depth);
+            checkRoom(current, "Left", depth);
+
+            fillSideRooms(current.Next, depth);
+        }
+
+        private bool simpleChecks(Coords c)
+        {
+            if (c.x > this.n_length - 1 || c.y > this.n_length - 1 || c.x < 0 || c.y < 0)
+            {
+                return false;
+            }
+
+            // Space not free
+            if (this.map[c.x, c.y] != null)  
+            {
+                return false;
+            }
+            
+            // Already visited
+            if (this.visitedNodes[c.x, c.y])
+            {
+                return false;
+            }
+            return true;
+        }
+
+        // Recursive function for deciding 
+        // TODO
+        private void checkRoom(Room prev, String next, int depth)
+        {
+            // No more depth
+            if (depth == 0)
             {
                 return;
             }
 
-            // TODO: This shit
-            
-            // Seems like a recursion problem
-            checkUp(from, current, max_depth);
-            checkRight(from, current, max_depth);
-            checkDown(from, current, max_depth);
-            checkLeft(from, current, max_depth);
+            // Probability to spawn room here
+            // Set probability spawn to 66%
+            if (rand.Next(2) == 2)
+            {
+                return;
+            }
 
-            Coords next = new Coords(current.x + 1, current.y);
-            fillSideRooms(current, next, max_depth);
 
+            // setup items for generating 
+            Coords current = new Coords();
+            SideRoom r = new SideRoom();
+            switch(next)
+            {
+                case "Up":
+                    current = new Coords(prev.coords.x - 1, prev.coords.y);
+                    if (!simpleChecks(current)){
+                        return;
+                    }
+                    // linkages here
+                    r = new SideRoom(current.x, current.y);
+                    this.map[current.x, current.y] = r;
+                    prev.Up = r;
+                    r.Down = prev;
+                    break;
+                case "Right":
+                    current = new Coords(prev.coords.x, prev.coords.y + 1);
+                    if (!simpleChecks(current)){
+                        return;
+                    }
+                    // linkages here
+                    r = new SideRoom(current.x, current.y);
+                    this.map[current.x, current.y] = r;
+                    prev.Right = r;
+                    r.Left = prev;
+                    break;
+                case "Down":
+                    current = new Coords(prev.coords.x + 1, prev.coords.y);
+                    if (!simpleChecks(current)){
+                        return;
+                    }
+                    // linkages here
+                    r = new SideRoom(current.x, current.y);
+                    this.map[current.x, current.y] = r;
+                    prev.Down = r;
+                    r.Up = prev;
+                    break;
+                case "Left":
+                    current = new Coords(prev.coords.x, prev.coords.y - 1);
+                    if (!simpleChecks(current)){
+                        return;
+                    }
+                    // linkages here
+                    r = new SideRoom(current.x, current.y);
+                    this.map[current.x, current.y] = r;
+                    prev.Left = r;
+                    r.Right = prev;
+                    break;
+                default:
+                    break;
+            }
+            // if spawn, set to true
+            this.visitedNodes[current.x, current.y] = true;
+
+            // continue with other rooms
+            checkRoom(r, "Up", depth - 1);
+            checkRoom(r, "Right", depth - 1);
+            checkRoom(r, "Down", depth - 1);
+            checkRoom(r, "Left", depth - 1);
         }
-
-        // Recursive function for deciding 
-        private void checkUp(int current_x, int current_y, int depth)
-        {
-
-        }
-        private void checkRight(int current_x, int current_y, int depth)
-        {
-
-        }
-        private void checkLeft(int current_x, int current_y, int depth)
-        {
-
-        }
-        private void checkDown(int current_x, int current_y, int depth)
-        {
-
-        }
+        
 
 
         // helper function for filling up main path rooms between start and end 
@@ -172,12 +264,11 @@ namespace DungeonGeneration
             // Add other
             if (vector_other != 0)
             {
-                Random random = new Random();
                 int[] insert_positions = new int[vector_other + 1];
                 for (int i=0;i<vector_other + 1;i++)
                 {
                     // Generate list of positions to insert into
-                    insert_positions[i] = random.Next(vector_right);
+                    insert_positions[i] = this.rand.Next(vector_right);
                 }
 
                 // Create List order to insert
@@ -246,16 +337,19 @@ namespace DungeonGeneration
                 {
                     case "Up":
                         this.map[current_x, current_y].Up = r;
+                        this.map[current_x, current_y].Next = r;
                         r.Down = this.map[current_x, current_y];
                         current_x -= 1;
                         break;
                     case "Down":
                         this.map[current_x, current_y].Down = r;
+                        this.map[current_x, current_y].Next = r;
                         r.Up = this.map[current_x, current_y];
                         current_x += 1;
                         break;
                     default:  // right
                         this.map[current_x, current_y].Right = r;
+                        this.map[current_x, current_y].Next = r;
                         r.Left = this.map[current_x, current_y];
                         current_y += 1;
                         break;
@@ -272,9 +366,8 @@ namespace DungeonGeneration
         {
             int arrayLength = map.GetLength(1);
 
-            Random random = new Random();
-            int start_x = random.Next(arrayLength);
-            int end_x = random.Next(arrayLength);
+            int start_x = this.rand.Next(arrayLength);
+            int end_x = this.rand.Next(arrayLength);
 
             StartRoom s = new StartRoom();
             s.coords = new Coords(start_x, 0);
@@ -343,35 +436,22 @@ namespace DungeonGeneration
         public Room Down;
         public Room Left;
         public Room Right;
+        public Room Next;
 
         // Default constructor
         public Room(){}
+
+        public Room(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
 
         // For testing purposes, does something in the room
         public abstract int Do();
 
         public abstract string GetName();
 
-        /* public Room GetNextRoom(string name)
-        {
-            if (this.Up?.GetName() == name)
-            {
-                return this.Up;
-            }
-            if (this.Right?.GetName() == name)
-            {
-                return this.Right;
-            }
-            if (this.Down?.GetName() == name)
-            {
-                return this.Down;
-            }
-            /* if (this.Left?.GetName() == name)
-            {
-                return this.Left;
-            } */
-            return null;
-        } */
+        
     }
 
     public struct Coords
@@ -389,6 +469,11 @@ namespace DungeonGeneration
     {
         public StartRoom(){}
 
+        public StartRoom(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
+
         public override string GetName()
         {
             return "Start";
@@ -402,7 +487,13 @@ namespace DungeonGeneration
 
     public class NormalRoom : Room
     {
+
         public NormalRoom(){}
+
+        public NormalRoom(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
 
         public override string GetName()
         {
@@ -418,9 +509,14 @@ namespace DungeonGeneration
     {
         public SideRoom(){}
 
+        public SideRoom(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
+
         public override string GetName()
         {
-            return "Normal";
+            return "Side";
         }
 
         public override int Do(){
@@ -431,6 +527,11 @@ namespace DungeonGeneration
     public class BossRoom : Room
     {
         public BossRoom(){}
+
+        public BossRoom(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
 
         public override string GetName()
         {
@@ -446,6 +547,11 @@ namespace DungeonGeneration
     {
         public ShopRoom(){}
 
+        public ShopRoom(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
+
         public override string GetName()
         {
             return "Shop";
@@ -460,6 +566,11 @@ namespace DungeonGeneration
     {
         public TreasureRoom(){}
 
+        public TreasureRoom(int x, int y)
+        {
+            this.coords = new Coords(x, y);
+        }
+
         public override string GetName()
         {
             return "Treasure";
@@ -470,6 +581,5 @@ namespace DungeonGeneration
         }
 
     }
-
 
 }
