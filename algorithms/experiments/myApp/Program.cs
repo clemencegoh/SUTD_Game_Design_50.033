@@ -11,9 +11,15 @@ namespace myApp
     {
         static void Main(string[] args)
         {
-            // Console.WriteLine("Hello World!");
-            DungeonGeneration.Stage s = new DungeonGeneration.Stage(4);
-            s.PrintStage();  // prints the stage out
+            
+            DungeonGeneration.Stage s = new DungeonGeneration.Stage(6, 2);
+
+            DungeonGeneration.OverWorld overworld = new DungeonGeneration.OverWorld(s);
+
+            // overworld.first_stage.PrintStage();  // prints the stage out
+
+            // DungeonGeneration.Room r = overworld.first_stage.first_room;
+
 
         }
     }
@@ -58,6 +64,7 @@ namespace DungeonGeneration
     {
         public Room[,] map;
         public Stage next;
+        public Room first_room;
 
         // Default constructor, for placeholder Stage
         public Stage(){
@@ -65,27 +72,74 @@ namespace DungeonGeneration
             // Use Default of 4
             this.map = new Room[6, 6];
 
-            GenerateStage();
+            GenerateStage(0);
         }
 
-        public Stage(int min_nodes){
+        public Stage(int min_nodes, int max_depth){
             // min number of nodes before boss room
 
             // Generate 2D array placeholder
             this.map = new Room[min_nodes+2, min_nodes+2];
 
-            GenerateStage();
+            GenerateStage(max_depth);
         }
 
         // Generates the map of the entire stage
-        public void GenerateStage()
+        public void GenerateStage(int max_depth)
         {
             // Set start and boss
             int[] positions = this.setInitialRooms();
 
             // Start Generating
             fillMainRooms(positions[0], positions[1]);
+
+            // Fill side rooms
+            // fillSideRooms(positions[0], 0, max_depth);
+            
+            this.PrintStage();
         }
+
+
+        // Helper function for filling out side rooms
+        private void fillSideRooms(Coords from, Coords current, int max_depth)
+        {
+            int max_len = this.map.GetLength(0) - 1;
+            if (current.x > max_len || current.y > max_len)
+            {
+                return;
+            }
+
+            // TODO: This shit
+            
+            // Seems like a recursion problem
+            checkUp(from, current, max_depth);
+            checkRight(from, current, max_depth);
+            checkDown(from, current, max_depth);
+            checkLeft(from, current, max_depth);
+
+            Coords next = new Coords(current.x + 1, current.y);
+            fillSideRooms(current, next, max_depth);
+
+        }
+
+        // Recursive function for deciding 
+        private void checkUp(int current_x, int current_y, int depth)
+        {
+
+        }
+        private void checkRight(int current_x, int current_y, int depth)
+        {
+
+        }
+        private void checkLeft(int current_x, int current_y, int depth)
+        {
+
+        }
+        private void checkDown(int current_x, int current_y, int depth)
+        {
+
+        }
+
 
         // helper function for filling up main path rooms between start and end 
         private void fillMainRooms(int start, int end)
@@ -105,10 +159,7 @@ namespace DungeonGeneration
                 vector_other = start - end;
             }
 
-            // Console.WriteLine("move {0} right, move {1} {2}", vector_right, vector_other, direction ? "Up" : "Down");
-
             // Generate based on vectors
-
             // Create LinkedList for popping
             LinkedList<String> FillOrder = new LinkedList<String>();
 
@@ -132,9 +183,6 @@ namespace DungeonGeneration
                 // Create List order to insert
                 Array.Sort(insert_positions);
 
-                // Debug
-                // Console.WriteLine("[{0}]", string.Join(", ", insert_positions));
-
                 LinkedListNode<String> current = FillOrder.First;
                 for (int i=0; i<insert_positions[0]; i++)
                 {
@@ -154,18 +202,9 @@ namespace DungeonGeneration
                     }
                 }
             }
-
-            FillOrder.RemoveLast();
             
             LinkedListNode<String> curr = FillOrder.First;
             
-            /* while(curr.Next !=null)
-            {
-                Console.Write("{0}\t", curr.Value);
-                curr = curr.Next;
-            }
-            Console.WriteLine(); */
-
 
             int current_x = start;
             int current_y = 0;
@@ -175,19 +214,54 @@ namespace DungeonGeneration
             // Actually Insert
             while (curr.Next != null)
             {
+                bool lastRoom = false;
+
+                // check last case for boss room
+                if (current_y == this.map.GetLength(0) - 1)
+                {
+                    if (current_x + 1 == end || current_x - 1 == end)
+                    {
+                        lastRoom = true;
+                    }
+                }
+                
+                if (current_y == this.map.GetLength(0) - 2)
+                {
+                    if (current_x == end)
+                    {
+                        lastRoom = true;
+                    }
+                }
+
+                // create new room type based on last
+                Room r;
+                if (lastRoom)
+                {
+                    r = new BossRoom();
+                }else{
+                    r = new NormalRoom();
+                }
+                
                 switch (curr.Value)
                 {
                     case "Up":
+                        this.map[current_x, current_y].Up = r;
+                        r.Down = this.map[current_x, current_y];
                         current_x -= 1;
                         break;
                     case "Down":
+                        this.map[current_x, current_y].Down = r;
+                        r.Up = this.map[current_x, current_y];
                         current_x += 1;
                         break;
                     default:  // right
+                        this.map[current_x, current_y].Right = r;
+                        r.Left = this.map[current_x, current_y];
                         current_y += 1;
                         break;
                 }
-                this.map[current_x, current_y] = new NormalRoom();
+                this.map[current_x, current_y] = r;
+                r.coords = new Coords(current_x, current_y);
                 curr = curr.Next;
             }
 
@@ -204,12 +278,12 @@ namespace DungeonGeneration
 
             StartRoom s = new StartRoom();
             s.coords = new Coords(start_x, 0);
-
-            BossRoom b = new BossRoom();
-            b.coords = new Coords(end_x, arrayLength - 1);
-
+            this.first_room = s;
             this.map[s.coords.x, s.coords.y] = s;
-            this.map[b.coords.x, b.coords.y] = b;
+
+            /* BossRoom b = new BossRoom();
+            b.coords = new Coords(end_x, arrayLength - 1); */
+            // this.map[b.coords.x, b.coords.y] = b;
 
             int[] positions = new int[2];
             positions[0] = start_x;
@@ -265,6 +339,10 @@ namespace DungeonGeneration
     public abstract class Room{
 
         public Coords coords;
+        public Room Up;
+        public Room Down;
+        public Room Left;
+        public Room Right;
 
         // Default constructor
         public Room(){}
@@ -273,6 +351,27 @@ namespace DungeonGeneration
         public abstract int Do();
 
         public abstract string GetName();
+
+        /* public Room GetNextRoom(string name)
+        {
+            if (this.Up?.GetName() == name)
+            {
+                return this.Up;
+            }
+            if (this.Right?.GetName() == name)
+            {
+                return this.Right;
+            }
+            if (this.Down?.GetName() == name)
+            {
+                return this.Down;
+            }
+            /* if (this.Left?.GetName() == name)
+            {
+                return this.Left;
+            } */
+            return null;
+        } */
     }
 
     public struct Coords
